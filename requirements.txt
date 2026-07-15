@@ -1,0 +1,8 @@
+streamlit>=1.38
+duckdb>=1.5
+pandas>=2.2
+numpy>=1.26
+pyarrow>=21.0
+matplotlib>=3.8
+python-pptx>=1.0.2
+openpyxl>=3.1
