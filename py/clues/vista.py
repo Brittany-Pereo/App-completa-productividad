@@ -19,7 +19,14 @@ from py.clues.charts import (
     datos_personas_grafica,
     productividades_disponibles,
 )
-from py.clues.data_loader import CUBOS_PARQUET, MASTER_PPTX, PERSONAS_PARQUET, get_connection, load_clues_info
+from py.clues.data_loader import (
+    CUBOS_PARQUET,
+    MASTER_PPTX,
+    PERSONAS_PARQUET,
+    get_connection,
+    load_clues_info,
+    load_metas,
+)
 from py.clues.excel_export import crear_excel
 from py.clues.pptx_report import crear_reporte_productividad
 from py.clues.queries import construir_consulta_clues, construir_consulta_personas, obtener_clues_relacionadas
