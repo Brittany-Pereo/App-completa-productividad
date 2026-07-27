@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Vista de Streamlit para el modo "CLUES / Unidad médica".
+"""Vista de Streamlit para una CLUES / unidad médica ya seleccionada.
 
-`render()` dibuja toda la pantalla — el `app.py` de la raíz solo decide
-cuándo llamarla (según el modo elegido en el selector superior).
+`render_seleccion()` dibuja el dashboard — el selector (combinado con los
+planes de justicia) vive en el `app.py` de la raíz.
 """
 
 from __future__ import annotations
@@ -19,15 +19,7 @@ from py.clues.charts import (
     datos_personas_grafica,
     productividades_disponibles,
 )
-from py.clues.data_loader import (
-    CUBOS_PARQUET,
-    MASTER_PPTX,
-    PERSONAS_PARQUET,
-    get_connection,
-    load_choices,
-    load_clues_info,
-    load_metas,
-)
+from py.clues.data_loader import CUBOS_PARQUET, MASTER_PPTX, PERSONAS_PARQUET, get_connection, load_clues_info
 from py.clues.excel_export import crear_excel
 from py.clues.pptx_report import crear_reporte_productividad
 from py.clues.queries import construir_consulta_clues, construir_consulta_personas, obtener_clues_relacionadas
@@ -123,24 +115,7 @@ def _render_graficas(dpg: pd.DataFrame, dagp: pd.DataFrame, metas_filtrado: pd.D
                 st.pyplot(fig)
 
 
-def _render_consulta(clues_info: pd.DataFrame, metas: pd.DataFrame, choices: pd.DataFrame):
-    st.header("Consulta de Unidades Médicas")
-
-    label_map = dict(zip(choices["value"], choices["label"]))
-    valores = choices["value"].tolist()
-    default_idx = valores.index("NACIONAL") if "NACIONAL" in valores else 0
-
-    clues_seleccionada = st.selectbox(
-        "Selecciona una unidad médica:",
-        options=valores,
-        index=default_idx,
-        format_func=lambda v: label_map.get(v, v),
-        key="clues_selectbox",
-    )
-
-    if not clues_seleccionada:
-        return
-
+def render_seleccion(clues_seleccionada: str, clues_info: pd.DataFrame, metas: pd.DataFrame):
     historico, personas, error = _cargar_datos_clues(clues_seleccionada)
 
     if error:
@@ -190,38 +165,12 @@ def _render_consulta(clues_info: pd.DataFrame, metas: pd.DataFrame, choices: pd.
         except Exception as e:
             st.error(f"No se pudo generar el informe PowerPoint: {e}", icon="⚠️")
 
-
-def _render_ayuda():
-    st.header("Instrucciones de uso")
-    st.subheader("¿Cómo usar esta aplicación?")
-    st.markdown(
-        """
-        1. Selecciona una unidad médica (CLUES) del buscador
-        2. El sistema automáticamente buscará la información disponible
-        3. Los resultados se mostrarán en las gráficas
-        4. Puedes descargar los datos en formato Excel
-        """
-    )
-    st.subheader("¿Qué incluye?")
-    st.write("Información del tipo de unidad y productividad")
-    st.subheader("Formato de datos")
-    st.write("Los datos se pueden descargar en un archivo Excel.")
-
-
-def render():
-    clues_info = load_clues_info()
-    metas = load_metas()
-    choices = load_choices()
-
-    st.title("🏥 Productividad IMSS Bienestar — CLUES")
-
-    seccion = st.radio(
-        "Navegación", ["Consulta", "Ayuda"], label_visibility="collapsed",
-        horizontal=True, key="clues_navegacion",
-    )
-    st.divider()
-
-    if seccion == "Consulta":
-        _render_consulta(clues_info, metas, choices)
-    else:
-        _render_ayuda()
+    with st.expander("ℹ️ Ayuda / ¿Cómo usar esta app?"):
+        st.markdown(
+            """
+            1. Selecciona una unidad médica (CLUES) del buscador
+            2. El sistema automáticamente buscará la información disponible
+            3. Los resultados se mostrarán en las gráficas
+            4. Puedes descargar los datos en formato Excel
+            """
+        )

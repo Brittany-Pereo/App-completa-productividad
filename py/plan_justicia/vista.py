@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Vista de Streamlit para el modo "Plan de Justicia".
+"""Vista de Streamlit para un plan de justicia ya seleccionado.
 
-`render()` dibuja toda la pantalla — el `app.py` de la raíz solo decide
-cuándo llamarla (según el modo elegido en el selector superior).
+`render_seleccion()` dibuja el dashboard — el selector (combinado con las
+CLUES) vive en el `app.py` de la raíz.
 """
 
 from __future__ import annotations
@@ -20,13 +20,7 @@ import pandas as pd
 import streamlit as st
 
 from py.plan_justicia.pptx_report import crear_reporte_productividad, fmt_num
-from py.plan_justicia.data_io import (
-    cargar_clues_info,
-    cargar_metas_clues,
-    consultar_datos,
-    opciones_selector_clues,
-    procedimientos_personas_filtrado,
-)
+from py.plan_justicia.data_io import consultar_datos, procedimientos_personas_filtrado
 
 COLOR_GUINDA = "#611232"
 COLOR_VERDE = "#1E5B4F"
@@ -191,22 +185,7 @@ def _crear_excel_bytes(clues_seleccionada, datos, clues_info):
 # ---------------------------------------------------------------------------
 # Pantalla
 # ---------------------------------------------------------------------------
-def render():
-    st.title("📊 Productividad por Plan de Justicia")
-    st.caption("IMSS Bienestar · Información 2020 a la fecha")
-
-    clues_info = cargar_clues_info()
-    metas_clues = cargar_metas_clues()
-    opciones = opciones_selector_clues()
-
-    etiqueta_sel = st.selectbox(
-        "Selecciona un Plan de Justicia:",
-        options=list(opciones.keys()),
-        index=0,
-        placeholder="Busca por plan de justicia",
-    )
-    clues_seleccionada = opciones[etiqueta_sel]
-
+def render_seleccion(clues_seleccionada: str, clues_info: pd.DataFrame, metas_clues: pd.DataFrame):
     with st.spinner("Consultando datos..."):
         datos = consultar_datos(clues_seleccionada)
 
