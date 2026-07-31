@@ -212,21 +212,29 @@ def render_seleccion(clues_seleccionada: str, clues_info: pd.DataFrame, metas_cl
     else:
         metas_filtrado = metas_clues[metas_clues["clues"] == clues_seleccionada]
 
+    figuras = [
+        _grafica_avance_meta(datos, "consulta_general", "Consulta general", datos_anual_grafica, metas_filtrado),
+        _grafica_avance_meta(datos, "consulta_especialidad", "Consulta de especialidad",
+                             datos_anual_grafica, metas_filtrado),
+        _grafica_avance_meta(datos, "procedimientos_qx", "Procedimientos quirúrgicos",
+                             datos_anual_grafica, metas_filtrado),
+        _grafica_avance_meta(datos, "egresos", "Egresos", datos_anual_grafica, metas_filtrado),
+    ]
+
     col1, col2 = st.columns(2)
     with col1:
-        st.pyplot(_grafica_avance_meta(datos, "consulta_general", "Consulta general",
-                                        datos_anual_grafica, metas_filtrado))
+        st.pyplot(figuras[0])
     with col2:
-        st.pyplot(_grafica_avance_meta(datos, "consulta_especialidad", "Consulta de especialidad",
-                                        datos_anual_grafica, metas_filtrado))
+        st.pyplot(figuras[1])
 
     col3, col4 = st.columns(2)
     with col3:
-        st.pyplot(_grafica_avance_meta(datos, "procedimientos_qx", "Procedimientos quirúrgicos",
-                                        datos_anual_grafica, metas_filtrado))
+        st.pyplot(figuras[2])
     with col4:
-        st.pyplot(_grafica_avance_meta(datos, "egresos", "Egresos",
-                                        datos_anual_grafica, metas_filtrado))
+        st.pyplot(figuras[3])
+
+    for fig in figuras:
+        plt.close(fig)
 
     st.divider()
 
